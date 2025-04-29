@@ -7,6 +7,7 @@ import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.entity.Setmeal;
 import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
@@ -20,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -133,6 +136,82 @@ public class DishServiceImpI implements DishService {
         return dishVO;
     }
 
+    /**
+     * 条件查询菜品和口味
+     * @param dish
+     * @return
+     */
+    public List<DishVO> listWithFlavor(Dish dish) {
+        List<Dish> dishList = dishMapper.list(dish);
+
+        List<DishVO> dishVOList = new ArrayList<>();
+
+        for (Dish d : dishList) {
+            DishVO dishVO = new DishVO();
+            BeanUtils.copyProperties(d,dishVO);
+
+            //根据菜品id查询对应的口味
+            List<DishFlavor> flavors = dishFlavorMapper.getByDishId(d.getId());
+
+            dishVO.setFlavors(flavors);
+            dishVOList.add(dishVO);
+        }
+
+        return dishVOList;
+    }
+
+    @Override
+    public List<Dish> list(Long categoryId) {
+        Dish dish = Dish.builder()
+                .categoryId(categoryId)
+                .status(StatusConstant.ENABLE)
+                .build();
+
+        return dishMapper.list(dish);
+
+    }
+
+    /**
+     * 修改菜品起售停售
+     * @param status
+     * @param id
+     */
+    @Override
+    public void updateStatus(Integer status, Long id) {
+        // 判断是否能够被停售
+        if(status == StatusConstant.ENABLE){
+            // 要将与之关联的套餐停售
+            List<Long> dishIds = new ArrayList<>();
+            dishIds.add(id);
+
+            // 获取到关联的套餐id
+            List<Long> setmealIds = setmealMapper.getSetmealIdsByDishIds(dishIds);
+
+            if(setmealIds != null && setmealIds.size() > 0){
+                for(Long setmealId : setmealIds){
+                    // 修改套餐状态
+                    Setmeal setmeal = Setmeal.builder()
+                            .id(setmealId)
+                            .status(StatusConstant.DISABLE)
+                            .build();
+
+                    setmealMapper.update(setmeal);
+                }
+            }
+        }
+
+        Dish dish = Dish.builder()
+                .id(id)
+                .status(status)
+                .build();
+        dishMapper.update(dish);
+
+    }
+
+    /**
+     * 修改菜品
+     * @param dishDTO
+     */
     @Transactional
     @Override
     public void updateWithFlavor(DishDTO dishDTO) {
