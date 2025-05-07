@@ -71,6 +71,10 @@ public class ShoppingCartServiceImpI implements ShoppingCartService {
         }
     }
 
+    /**
+     * 查看购物车
+     * @return
+     */
     @Override
     public List<ShoppingCart> list() {
       ShoppingCart  shoppingCart = ShoppingCart.builder()
@@ -79,11 +83,18 @@ public class ShoppingCartServiceImpI implements ShoppingCartService {
         return shoppingCartMapper.list(shoppingCart);
     }
 
+    /**
+     * 清空购物车
+     */
     @Override
     public void clean() {
         shoppingCartMapper.deteleById(BaseContext.getCurrentId());
     }
 
+    /**
+     * 减少购物车
+     * @param shoppingCartDTO
+     */
     @Override
     public void sub(ShoppingCartDTO shoppingCartDTO) {
         ShoppingCart shoppingCart = new ShoppingCart();
