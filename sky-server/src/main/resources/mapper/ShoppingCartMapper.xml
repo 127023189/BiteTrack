@@ -11,4 +11,15 @@
         </where>
         order by create_time desc
     </select>
+
+    <insert id="insertBatch" parameterType="list">
+        insert into shopping_cart
+        (name, image, user_id, dish_id, setmeal_id, dish_flavor, number, amount, create_time)
+        values
+            <foreach collection="shoppingCartList" item="shop" separator=",">
+                (#{shop.name}, #{shop.image}, #{shop.userId}, #{shop.dishId}, #{shop.setmealId}, #{shop.dishFlavor},
+                #{shop.number}, #{shop.amount}, #{shop.createTime})
+            </foreach>
+    </insert>
+
 </mapper>
