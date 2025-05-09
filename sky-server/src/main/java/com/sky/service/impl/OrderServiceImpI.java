@@ -22,6 +22,7 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -67,7 +68,8 @@ public class OrderServiceImpI implements OrderService {
     @Autowired
     private WeChatPayUtil weChatPayUtil;
 
-
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     private void checkOutOfRange(String address){
         Map map = new HashMap();
@@ -243,6 +245,15 @@ public class OrderServiceImpI implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+        
+        // 响应到服务器使用websocket
+        Map map  = new HashMap<>();
+
+        map.put("type", 1); // 1为来单提醒 2为客户催单
+        map.put("orderId", ordersDB.getId());
+        map.put("content", MessageConstant.ORDER_ID + outTradeNo);
+
+        webSocketServer.sendToAllClient(JSON.toJSONString(map));
     }
 
     /**

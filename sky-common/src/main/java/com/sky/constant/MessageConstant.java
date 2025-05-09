@@ -30,4 +30,8 @@ public class MessageConstant {
     public static final String DELIVERY_ROUTE_PLANNING_FAILED = "配送路线规划失败";
     // 超出配送范围
     public static final String DELIVERY_DISTANCE_EXCEEDS_THE_LIMIT = "超出配送范围";
+    // 订单超时，自动取消
+    public static final String ORDER_TIMEOUT_AUTOMATIC_CANCELLATION = "订单超时，自动取消";
+    // 订单号
+    public static final String ORDER_ID = "订单号";
 }
