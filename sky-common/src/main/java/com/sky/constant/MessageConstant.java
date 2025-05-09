@@ -33,5 +33,5 @@ public class MessageConstant {
     // 订单超时，自动取消
     public static final String ORDER_TIMEOUT_AUTOMATIC_CANCELLATION = "订单超时，自动取消";
     // 订单号
-    public static final String ORDER_ID = "订单号";
+    public static final String ORDER_ID = "订单号:";
 }

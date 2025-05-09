@@ -531,6 +531,25 @@ public class OrderServiceImpI implements OrderService {
     }
 
     /**
+     * 催单
+     */
+    @Override
+    public void reminder(Long id) {
+        Orders ordersDB = orderMapper.getById(id);
+        if(ordersDB == null){
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+
+        // 发送短信
+        Map map = new HashMap();
+        map.put("type",2);
+        map.put("orderId",id);
+        map.put("content",MessageConstant.ORDER_ID + ordersDB.getNumber());
+        webSocketServer.sendToAllClient(JSON.toJSONString(map));
+
+    }
+
+    /**
      * 获取订单菜品信息
      * @param page
      * @return
